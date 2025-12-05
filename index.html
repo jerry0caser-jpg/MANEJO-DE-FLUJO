@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Ingresos y Egresos</title>
+    <style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+#company-info {
+    display: flex;
+    align-items: center;
+}
+
+#company-name-display {
+    font-size: 1.2em;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-left: 5px;
+    font-size: 0.95em;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+button.delete-btn {
+    background-color: #dc3545;
+    padding: 5px 10px;
+    font-size: 0.85em;
+    margin-left: 2px;
+}
+
+button.delete-btn:hover {
+    background-color: #c82333;
+}
+
+button.edit-btn {
+    background-color: #ffc107;
+    color: black;
+    padding: 5px 10px;
+    font-size: 0.85em;
+    margin-left: 2px;
+}
+
+button.edit-btn:hover {
+    background-color: #e0a800;
+}
+
+button.edit-balance-btn {
+    background-color: #17a2b8;
+    color: white;
+    padding: 5px 10px;
+    font-size: 0.85em;
+    margin-left: 5px;
+}
+
+button.edit-balance-btn:hover {
+    background-color: #138496;
+}
+
+button.period-btn {
+    background-color: #007bff;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    text-align: left;
+}
+
+button.period-btn:hover {
+    background-color: #0056b3;
+}
+
+button.period-btn.active {
+    background-color: #28a745;
+}
+
+main {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+section {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    color: #007bff;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+h3 {
+    color: #28a745;
+    margin-top: 0;
+}
+
+input[type="text"], 
+input[type="number"], 
+input[type="date"], 
+input[type="color"],
+select, 
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+input[type="color"] {
+    width: 100%;
+    height: 40px;
+    padding: 5px;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#movement-form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+#movement-form textarea {
+    grid-column: 1 / -1;
+}
+
+#movement-form button {
+    grid-column: 1 / -1;
+    padding: 10px;
+    font-size: 1.1em;
+    margin-left: 0;
+}
+
+#edit-movement-form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+#edit-movement-form textarea {
+    grid-column: 1 / -1;
+}
+
+#edit-movement-form button {
+    grid-column: 1 / -1;
+    padding: 10px;
+    font-size: 1em;
+    margin-left: 0;
+    margin-top: 10px;
+}
+
+#table-filters {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+#table-filters input,
+#table-filters select {
+    margin: 0;
+    padding: 8px;
+}
+
+#table-filters button {
+    margin: 0;
+}
+
+#clear-filters-btn {
+    background-color: #6c757d;
+}
+
+#clear-filters-btn:hover {
+    background-color: #5a6268;
+}
+
+#table-wrapper {
+    overflow-x: auto;
+}
+
+#movement-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+#movement-table th, 
+#movement-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+#movement-table th {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+#movement-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+#movement-table tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+.facturado {
+    background-color: #d4edda !important;
+}
+
+.pendiente {
+    background-color: #fff3cd !important;
+}
+
+.sin-factura {
+    background-color: white !important;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    color: #007bff;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+    margin-top: 0;
+}
+
+#configuration-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+#configuration-section > h2 {
+    grid-column: 1 / -1;
+}
+
+.config-group {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.config-group h3 {
+    margin-top: 0;
+    color: #28a745;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.config-group button {
+    width: 100%;
+    margin-top: 5px;
+    margin-left: 0;
+}
+
+#area-subaccount-list, 
+#payment-method-list, 
+#custom-color-list,
+#brand-list {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 4px;
+}
+
+.list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dotted #ccc;
+    font-size: 0.95em;
+}
+
+.list-item:last-child {
+    border-bottom: none;
+}
+
+.list-item button {
+    background-color: #dc3545;
+    padding: 3px 8px;
+    font-size: 0.8em;
+    margin-left: 10px;
+    margin: 0;
+}
+
+.list-item button:hover {
+    background-color: #c82333;
+}
+
+#initial-balance-modal label,
+#edit-initial-balance-modal label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+#initial-balance-modal input,
+#edit-initial-balance-modal input {
+    margin-bottom: 10px;
+}
+
+#initial-balance-display {
+    font-size: 1.1em;
+    font-weight: bold;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#saved-periods-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.period-card {
+    background-color: #f9f9f9;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.period-card:hover {
+    background-color: #e9ecef;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.period-card.active {
+    border-color: #28a745;
+    background-color: #d4edda;
+}
+
+.period-card h4 {
+    margin: 0 0 10px 0;
+    color: #007bff;
+    font-size: 1.1em;
+}
+
+.period-card p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.period-card-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.period-card-actions button {
+    flex: 1;
+    padding: 5px;
+    font-size: 0.85em;
+    margin: 0;
+}
+
+#new-period-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+#new-period-section h3 {
+    grid-column: 1 / -1;
+}
+
+#new-period-section label {
+    margin-bottom: 0;
+}
+
+#new-period-section input,
+#new-period-section select {
+    margin: 0 0 10px 0;
+}
+
+#new-period-section button {
+    grid-column: 1 / -1;
+    margin: 0;
+}
+
+#summary-config {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    background-color: #f9f9f9;
+}
+
+#summary-filters-container {
+    margin-bottom: 15px;
+}
+
+.summary-filter {
+    border: 1px solid #eee;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    align-items: center;
+    background-color: white;
+}
+
+.summary-filter select {
+    margin: 0;
+    padding: 8px;
+}
+
+.summary-filter button {
+    background-color: #dc3545;
+    margin: 0;
+}
+
+.summary-filter button:hover {
+    background-color: #c82333;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 3px solid #007bff;
+    font-size: 0.9em;
+}
+
+footer p {
+    margin: 0;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #movement-form,
+    #edit-movement-form {
+        grid-template-columns: 1fr;
+    }
+
+    #table-filters {
+        grid-template-columns: 1fr;
+    }
+
+    #movement-table {
+        font-size: 0.8em;
+    }
+
+    #movement-table th,
+    #movement-table td {
+        padding: 5px;
+    }
+
+    #configuration-section {
+        grid-template-columns: 1fr;
+    }
+
+    #saved-periods-container {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Registro de Movimientos Financieros</h1>
+        <div id="company-info">
+            <span id="company-name-display"></span>
+            <button id="edit-company-name-btn">Modificar Nombre</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Modal para configurar el nombre de la empresa -->
+        <div id="company-name-modal" class="modal">
+            <div class="modal-content">
+                <h2>Configurar Nombre de la Empresa</h2>
+                <input type="text" id="company-name-input" placeholder="Ingrese el nombre de la empresa">
+                <button id="save-company-name-btn">Guardar</button>
+            </div>
+        </div>
+
+        <!-- Sección de Configuración (Áreas, Subcuentas, Formas de Pago, Empresas) -->
+        <section id="configuration-section">
+            <h2>Configuración de Catálogos</h2>
+            <div class="config-group">
+                <h3>Empresas/Marcas</h3>
+                <input type="text" id="new-brand-input" placeholder="Nueva Empresa/Marca">
+                <button id="add-brand-btn">Agregar Empresa</button>
+                <div id="brand-list"></div>
+            </div>
+            <div class="config-group">
+                <h3>Áreas y Subcuentas</h3>
+                <input type="text" id="new-area-input" placeholder="Nueva Área">
+                <button id="add-area-btn">Agregar Área</button>
+                <input type="text" id="new-subaccount-input" placeholder="Nueva Subcuenta">
+                <button id="add-subaccount-btn">Agregar Subcuenta</button>
+                <div id="area-subaccount-list"></div>
+            </div>
+            <div class="config-group">
+                <h3>Formas de Pago</h3>
+                <input type="text" id="new-payment-method-input" placeholder="Nueva Forma de Pago">
+                <button id="add-payment-method-btn">Agregar Forma de Pago</button>
+                <div id="payment-method-list"></div>
+            </div>
+            <div class="config-group">
+                <h3>Colores de Facturación Especial</h3>
+                <input type="text" id="new-color-name-input" placeholder="Nombre del Color">
+                <input type="color" id="new-color-picker">
+                <button id="add-custom-color-btn">Agregar Color</button>
+                <div id="custom-color-list"></div>
+            </div>
+        </section>
+
+        <!-- Sección de Selección de Mes y Saldo Inicial -->
+        <section id="month-selection-section">
+            <h2>Selección de Periodo y Saldo Inicial</h2>
+            <select id="month-select"></select>
+            <select id="year-select"></select>
+            <button id="load-month-btn">Cargar Periodo</button>
+            <button id="new-month-btn">Nuevo Periodo</button>
+
+            <div id="initial-balance-display" style="margin-top: 10px;">
+                <!-- Aquí se mostrará el saldo inicial -->
+            </div>
+
+            <!-- Modal para Saldo Inicial -->
+            <div id="initial-balance-modal" class="modal">
+                <div class="modal-content">
+                    <h2>Saldo Inicial para <span id="modal-month-year"></span></h2>
+                    <label for="initial-bank-input">Banco:</label>
+                    <input type="number" id="initial-bank-input" value="0.00" step="0.01">
+                    <label for="initial-cash-input">Efectivo:</label>
+                    <input type="number" id="initial-cash-input" value="0.00" step="0.01">
+                    <p>Total: <span id="initial-balance-total">0.00</span></p>
+                    <button id="save-initial-balance-btn">Guardar Saldo Inicial</button>
+                </div>
+            </div>
+
+            <!-- Modal para Editar Saldo Inicial -->
+            <div id="edit-initial-balance-modal" class="modal">
+                <div class="modal-content">
+                    <h2>Editar Saldo Inicial para <span id="edit-modal-month-year"></span></h2>
+                    <label for="edit-initial-bank-input">Banco:</label>
+                    <input type="number" id="edit-initial-bank-input" value="0.00" step="0.01">
+                    <label for="edit-initial-cash-input">Efectivo:</label>
+                    <input type="number" id="edit-initial-cash-input" value="0.00" step="0.01">
+                    <p>Total: <span id="edit-initial-balance-total">0.00</span></p>
+                    <button id="save-edit-initial-balance-btn">Guardar Cambios</button>
+                    <button id="cancel-edit-initial-balance-btn">Cancelar</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de Registro de Movimientos -->
+        <section id="movement-registration-section" style="display: none;">
+            <h2>Registro de Nuevo Movimiento</h2>
+            <form id="movement-form">
+                <input type="date" id="movement-date" required>
+                <input type="text" id="movement-concept" placeholder="Concepto del Movimiento" required>
+                <select id="movement-brand" required></select>
+
+                <select id="movement-area" required></select>
+                <select id="movement-subaccount" required></select>
+                <select id="movement-payment-method" required></select>
+
+                <select id="movement-type" required>
+                    <option value="">Tipo</option>
+                    <option value="ingreso">Ingreso</option>
+                    <option value="egreso">Egreso</option>
+                </select>
+                <input type="number" id="movement-amount" placeholder="Monto" step="0.01" required>
+
+                <select id="movement-invoicing-status" required>
+                    <option value="">Facturación</option>
+                    <option value="facturado">Facturado</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="sin-factura">Sin Factura</option>
+                    <option value="custom-color">Facturas con este color</option>
+                </select>
+                <input type="text" id="movement-invoice-number" placeholder="N° Factura" style="display: none;">
+                <select id="movement-custom-color-select" style="display: none;"></select>
+
+                <textarea id="movement-notes" placeholder="Notas"></textarea>
+
+                <button type="submit">Registrar Movimiento</button>
+            </form>
+        </section>
+
+        <!-- Sección de Tabla de Movimientos -->
+        <section id="movement-table-section" style="display: none;">
+            <h2>Movimientos del Periodo</h2>
+            <div id="table-filters">
+                <input type="text" id="filter-concept" placeholder="Filtrar por Concepto">
+                <select id="filter-brand"></select>
+                <select id="filter-area"></select>
+                <select id="filter-subaccount"></select>
+                <select id="filter-payment-method"></select>
+                <select id="filter-type">
+                    <option value="">Todos los Tipos</option>
+                    <option value="ingreso">Ingreso</option>
+                    <option value="egreso">Egreso</option>
+                </select>
+                <button id="clear-filters-btn">Limpiar Filtros</button>
+            </div>
+            <div id="table-wrapper">
+                <table id="movement-table">
+                    <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Concepto</th>
+                            <th>Empresa/Marca</th>
+                            <th>Área</th>
+                            <th>Subcuenta</th>
+                            <th>Forma de Pago</th>
+                            <th>Tipo</th>
+                            <th>Monto</th>
+                            <th>Saldo</th>
+                            <th>Facturación</th>
+                            <th>Notas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Filas de movimientos se insertarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Modal para Editar Movimiento -->
+        <div id="edit-movement-modal" class="modal">
+            <div class="modal-content">
+                <h2>Editar Movimiento</h2>
+                <form id="edit-movement-form">
+                    <input type="date" id="edit-movement-date" required>
+                    <input type="text" id="edit-movement-concept" placeholder="Concepto del Movimiento" required>
+                    <select id="edit-movement-brand" required></select>
+
+                    <select id="edit-movement-area" required></select>
+                    <select id="edit-movement-subaccount" required></select>
+                    <select id="edit-movement-payment-method" required></select>
+
+                    <select id="edit-movement-type" required>
+                        <option value="">Tipo</option>
+                        <option value="ingreso">Ingreso</option>
+                        <option value="egreso">Egreso</option>
+                    </select>
+                    <input type="number" id="edit-movement-amount" placeholder="Monto" step="0.01" required>
+
+                    <select id="edit-movement-invoicing-status" required>
+                        <option value="">Facturación</option>
+                        <option value="facturado">Facturado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="sin-factura">Sin Factura</option>
+                        <option value="custom-color">Facturas con este color</option>
+                    </select>
+                    <input type="text" id="edit-movement-invoice-number" placeholder="N° Factura" style="display: none;">
+                    <select id="edit-movement-custom-color-select" style="display: none;"></select>
+
+                    <textarea id="edit-movement-notes" placeholder="Notas"></textarea>
+
+                    <button type="submit">Guardar Cambios</button>
+                    <button type="button" id="cancel-edit-btn">Cancelar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sección de Reportes -->
+        <section id="reports-section" style="display: none;">
+            <h2>Reportes y Descargas</h2>
+            <button id="download-full-table-pdf-btn">Descargar Tabla Completa (PDF)</button>
+
+            <h3>Resumen Personalizado (PDF)</h3>
+            <div id="summary-config">
+                <div id="summary-filters-container">
+                    <!-- Filtros de resumen se insertarán aquí -->
+                </div>
+                <button id="add-summary-filter-btn">Agregar Combinación de Filtro</button>
+                <button id="download-summary-pdf-btn">Descargar Resumen (PDF)</button>
+            </div>
+        </section>
+
+        <!-- Sección de Gestión de Periodos Guardados -->
+        <section id="saved-periods-section">
+            <h2>Periodos Guardados</h2>
+            <div id="saved-periods-container">
+                <!-- Periodos guardados se mostrarán aquí -->
+            </div>
+            <div id="new-period-section" style="margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
+                <h3>Crear Nuevo Periodo</h3>
+                <label for="new-period-name">Nombre del Periodo:</label>
+                <input type="text" id="new-period-name" placeholder="Ej: Enero 2024, Febrero 2024, etc.">
+                <label for="new-period-month">Mes:</label>
+                <select id="new-period-month"></select>
+                <label for="new-period-year">Año:</label>
+                <select id="new-period-year"></select>
+                <label for="precarga-checkbox">
+                    <input type="checkbox" id="precarga-checkbox"> Precargar datos del mes anterior
+                </label>
+                <button id="create-new-period-btn">Crear Periodo</button>
+            </div>
+        </section>
+    </main>
+
+    <footer id="developer-footer">
+        <p>DESARROLLADO POR: GERARDO CASTAÑEDA SERRANO</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
